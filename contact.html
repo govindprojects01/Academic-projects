@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Contact Us | Govind Projects</title>
+<link rel="stylesheet" href="style.css">
+
+<style>
+.contact-section{
+  max-width:900px;
+  margin:60px auto;
+  background:#ffffff;
+  padding:45px;
+  border-radius:16px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.12);
+}
+.contact-section h1{
+  text-align:center;
+  color:#0b78c1;
+  margin-bottom:8px;
+}
+.contact-section .subtitle{
+  text-align:center;
+  color:#555;
+  margin-bottom:40px;
+  font-size:17px;
+}
+
+.contact-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:30px;
+}
+
+.contact-card{
+  background:#f4f6f8;
+  padding:28px;
+  border-radius:14px;
+  transition:0.3s;
+}
+.contact-card:hover{
+  transform:translateY(-5px);
+}
+
+.contact-card h3{
+  color:#0b78c1;
+  margin-bottom:10px;
+}
+.contact-card p{
+  font-size:16px;
+  color:#333;
+  line-height:1.7;
+}
+.contact-card a{
+  color:#0b78c1;
+  text-decoration:none;
+  font-weight:bold;
+}
+
+@media(max-width:700px){
+  .contact-grid{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="logo">Govind Projects</div>
+  <div class="menu">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="services.html">Services</a>
+    <a href="contact.html">Contact</a>
+  </div>
+</nav>
+
+<!-- FLOATING BUTTONS -->
+<a href="https://wa.me/919559628719" class="whatsapp">WhatsApp</a>
+<a href="tel:9559628719" class="call">Call</a>
+
+<!-- CONTACT SECTION -->
+<section class="contact-section">
+  <h1>Contact Us</h1>
+  <p class="subtitle">For academic projects, assignments & professional guidance</p>
+
+  <div class="contact-grid">
+
+    <div class="contact-card">
+      <h3>📞 Call / WhatsApp</h3>
+      <p>
+        <a href="tel:9559628719">9559628719</a><br>
+        <a href="tel:8881470477">8881470477</a>
+      </p>
+    </div>
+
+    <div class="contact-card">
+      <h3>📧 Gmail</h3>
+      <p>
+        <a href="mailto:govindprojects@gmail.com">
+          govindprojects@gmail.com
+        </a>
+      </p>
+    </div>
+
+    <div class="contact-card">
+      <h3>📍 Location</h3>
+      <p>India</p>
+    </div>
+
+    <div class="contact-card">
+      <h3>⏰ Working Hours</h3>
+      <p>
+        Monday – Sunday<br>
+        9:00 AM – 10:00 PM
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+© 2026 Govind Projects | All Rights Reserved
+</footer>
+
+</body>
+</html>
