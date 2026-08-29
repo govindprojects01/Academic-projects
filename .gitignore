@@ -1,0 +1,7 @@
+.next/
+.next-old/
+node_modules/
+out/
+dist/
+*.log
+.env*
