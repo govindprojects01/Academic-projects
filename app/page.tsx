@@ -4,6 +4,7 @@ import { ButtonLink } from "@/components/ButtonLink";
 import { PageShell } from "@/components/PageShell";
 import { SectionHeading } from "@/components/SectionHeading";
 import { ServiceGrid } from "@/components/ServiceGrid";
+import { ServiceRequirementWorkspace } from "@/components/ServiceRequirementWorkspace";
 import { printingServices } from "@/lib/site";
 
 const features = [
@@ -48,10 +49,10 @@ export default function Home() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <ButtonLink href="/services" variant="whatsapp">
-                View Services
+                View Services & Demo
               </ButtonLink>
-              <ButtonLink href="/contact" variant="secondary">
-                Contact Us
+              <ButtonLink href="#requirement-form" variant="secondary">
+                Submit Requirement
               </ButtonLink>
             </div>
             <div className="mt-5">
@@ -123,17 +124,21 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Services Grid */}
       <section className="bg-white px-4 py-14 sm:px-6">
         <div className="mx-auto max-w-7xl">
           <SectionHeading
             title="Our Services"
-            subtitle="Complete academic project solutions with quality, accuracy and on-time delivery."
+            subtitle="Complete academic project solutions with quality, accuracy and on-time delivery. Click any service to view sample and get quote."
           />
           <div className="mt-10">
             <ServiceGrid />
           </div>
         </div>
       </section>
+
+      {/* Service Requirement Workspace & Sample Demo */}
+      <ServiceRequirementWorkspace />
     </PageShell>
   );
 }

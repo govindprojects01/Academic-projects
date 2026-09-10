@@ -36,6 +36,28 @@ export interface ProjectFile {
   created_at: string;
 }
 
+export interface ServiceEnquiry {
+  id: string;
+  full_name: string;
+  phone: string;
+  course: string;
+  branch: string;
+  university?: string;
+  project_type: string;
+  deadline: string;
+  topic: string;
+  preferred_tech?: string;
+  deliverables?: string;
+  pages?: string;
+  budget?: string;
+  notes?: string;
+  file_url?: string;
+  file_name?: string;
+  file_size?: string;
+  status: "PENDING" | "CONTACTED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
+  created_at: string;
+}
+
 // Upload a File directly from Next.js server to Cloudinary using streaming
 async function uploadToCloudinary(file: File, folder: string): Promise<string> {
   const bytes = await file.arrayBuffer();
@@ -237,3 +259,143 @@ export async function uploadDeliveryFiles(projectId: string, formData: FormData)
   revalidatePath("/admin");
   revalidatePath("/dashboard");
 }
+
+// ACTION: Submit Service Enquiry (Customer Requirement Form)
+export async function submitServiceEnquiry(formData: FormData) {
+  const fullName = (formData.get("name") || formData.get("fullName") || "").toString().trim();
+  const phone = (formData.get("phone") || "").toString().trim();
+  const course = (formData.get("course") || "").toString().trim();
+  const branch = (formData.get("branch") || "").toString().trim();
+  const university = (formData.get("university") || "").toString().trim();
+  const projectType = (formData.get("projectType") || "").toString().trim();
+  const deadline = (formData.get("deadline") || "").toString().trim();
+  const topic = (formData.get("topic") || "").toString().trim();
+  const pages = (formData.get("pages") || "").toString().trim();
+  const budget = (formData.get("budget") || "").toString().trim();
+  const notes = (formData.get("notes") || "").toString().trim();
+
+  const preferredTechArray = formData.getAll("preferredTech").map((t) => t.toString());
+  const preferredTech = preferredTechArray.join(", ");
+
+  const deliverablesArray = formData.getAll("deliverables").map((d) => d.toString());
+  const deliverables = deliverablesArray.join(", ");
+
+  if (!fullName || !phone || !course || !branch || !projectType || !topic || !deadline) {
+    throw new Error("Please fill in all required fields.");
+  }
+
+  // File upload handling (max 50 MB)
+  const file = formData.get("file") as File | null;
+  let fileUrl = "";
+  let fileName = "";
+  let fileSizeStr = "";
+
+  if (file && file.name && file.size > 0) {
+    const maxBytes = 50 * 1024 * 1024; // 50 MB
+    if (file.size > maxBytes) {
+      throw new Error("Uploaded file exceeds maximum limit of 50 MB.");
+    }
+    fileName = file.name;
+    fileSizeStr = `${(file.size / (1024 * 1024)).toFixed(2)} MB`;
+
+    try {
+      fileUrl = await uploadToCloudinary(file, "enquiries");
+    } catch (err: any) {
+      console.error("Cloudinary upload failed for enquiry attachment:", err);
+      // Fallback: continue saving enquiry without failing if database storage is needed
+    }
+  }
+
+  const result = await sql`
+    INSERT INTO service_enquiries (
+      full_name, phone, course, branch, university, project_type, deadline, topic,
+      preferred_tech, deliverables, pages, budget, notes, file_url, file_name, file_size
+    ) VALUES (
+      ${fullName}, ${phone}, ${course}, ${branch}, ${university}, ${projectType}, ${deadline}, ${topic},
+      ${preferredTech}, ${deliverables}, ${pages}, ${budget}, ${notes}, ${fileUrl}, ${fileName}, ${fileSizeStr}
+    )
+    RETURNING id
+  `;
+
+  const enquiryId = result[0]?.id;
+
+  revalidatePath("/services");
+  revalidatePath("/");
+  revalidatePath("/admin");
+
+  // Format WhatsApp message
+  const whatsappMsg = `Hello Project Area,
+
+I want to enquire about a ${course} project.
+
+Enquiry ID: ${enquiryId}
+Name: ${fullName}
+WhatsApp/Mobile: ${phone}
+Course: ${course}
+Branch: ${branch}
+University/College: ${university || "Not specified"}
+Project Type: ${projectType}
+Project Topic: ${topic}
+Required By: ${deadline}
+Preferred Tech: ${preferredTech || "Not specified"}
+Deliverables: ${deliverables || "Not specified"}
+Report Pages: ${pages || "Not specified"}
+Budget: ${budget || "Not specified"}
+Notes: ${notes || "None"}${fileUrl ? `\nAttachment URL: ${fileUrl}` : ""}`;
+
+  return {
+    success: true,
+    enquiryId,
+    whatsappUrl: `https://wa.me/919559628719?text=${encodeURIComponent(whatsappMsg)}`,
+  };
+}
+
+// ACTION: Fetch Service Enquiries for Admin
+export async function getServiceEnquiries(statusFilter?: string): Promise<ServiceEnquiry[]> {
+  const adminUser = await isAdmin();
+  if (!adminUser) {
+    throw new Error("Forbidden");
+  }
+
+  let result;
+  if (statusFilter && statusFilter !== "ALL") {
+    result = await sql`
+      SELECT * FROM service_enquiries WHERE status = ${statusFilter} ORDER BY created_at DESC
+    `;
+  } else {
+    result = await sql`
+      SELECT * FROM service_enquiries ORDER BY created_at DESC
+    `;
+  }
+
+  return result as ServiceEnquiry[];
+}
+
+// ACTION: Update Enquiry Status (Admin only)
+export async function updateEnquiryStatus(enquiryId: string, status: string) {
+  const adminUser = await isAdmin();
+  if (!adminUser) {
+    throw new Error("Forbidden");
+  }
+
+  await sql`
+    UPDATE service_enquiries SET status = ${status} WHERE id = ${enquiryId}
+  `;
+
+  revalidatePath("/admin");
+}
+
+// ACTION: Delete Service Enquiry (Admin only)
+export async function deleteServiceEnquiry(enquiryId: string) {
+  const adminUser = await isAdmin();
+  if (!adminUser) {
+    throw new Error("Forbidden");
+  }
+
+  await sql`
+    DELETE FROM service_enquiries WHERE id = ${enquiryId}
+  `;
+
+  revalidatePath("/admin");
+}
+
