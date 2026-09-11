@@ -12,7 +12,8 @@ import {
   MessageSquare,
   Sparkles,
   Info,
-  X
+  X,
+  LayoutDashboard
 } from "lucide-react";
 import { submitServiceEnquiry } from "@/app/actions";
 
@@ -92,6 +93,7 @@ export function ServiceRequirementWorkspace({ initialCourse }: ServiceRequiremen
   
   const [successData, setSuccessData] = useState<{
     enquiryId: string;
+    projectId?: string;
     whatsappUrl: string;
   } | null>(null);
 
@@ -141,6 +143,7 @@ export function ServiceRequirementWorkspace({ initialCourse }: ServiceRequiremen
         if (res.success) {
           setSuccessData({
             enquiryId: res.enquiryId,
+            projectId: res.projectId,
             whatsappUrl: res.whatsappUrl,
           });
         }
@@ -661,6 +664,14 @@ export function ServiceRequirementWorkspace({ initialCourse }: ServiceRequiremen
             </div>
 
             <div className="flex flex-col gap-2">
+              {successData.projectId && (
+                <a
+                  href={`/dashboard/projects/${successData.projectId}`}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-blue px-4 py-3 text-xs font-black text-white hover:bg-blue-600 transition shadow-sm"
+                >
+                  <LayoutDashboard className="h-4 w-4" /> View in Client Dashboard
+                </a>
+              )}
               <a
                 href={successData.whatsappUrl}
                 target="_blank"

@@ -118,12 +118,67 @@ export default function AdminProjectClient({ project: initialProject, files: ini
               </span>
             </div>
 
-            {/* Description */}
-            <div className="mt-6">
-              <h3 className="text-base font-bold text-slate-900">Requirements Detail</h3>
-              <p className="mt-3 text-sm text-slate-600 leading-relaxed whitespace-pre-wrap">
-                {project.description}
-              </p>
+            {/* Description & Structured Parameters */}
+            <div className="mt-6 space-y-6">
+              {(project.course || project.branch || project.project_type || project.deadline) && (
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 text-xs bg-slate-50 p-4 rounded-xl border border-slate-100">
+                  {project.course && (
+                    <div>
+                      <span className="block font-bold text-slate-400 text-[10px] uppercase">Course</span>
+                      <span className="font-bold text-slate-900">{project.course}</span>
+                    </div>
+                  )}
+                  {project.branch && (
+                    <div>
+                      <span className="block font-bold text-slate-400 text-[10px] uppercase">Branch / Stream</span>
+                      <span className="font-bold text-slate-900">{project.branch}</span>
+                    </div>
+                  )}
+                  {project.project_type && (
+                    <div>
+                      <span className="block font-bold text-slate-400 text-[10px] uppercase">Project Type</span>
+                      <span className="font-semibold text-slate-800">{project.project_type}</span>
+                    </div>
+                  )}
+                  {project.deadline && (
+                    <div>
+                      <span className="block font-bold text-slate-400 text-[10px] uppercase">Required By</span>
+                      <span className="font-semibold text-amber-700">📅 {project.deadline}</span>
+                    </div>
+                  )}
+                  {project.university && (
+                    <div>
+                      <span className="block font-bold text-slate-400 text-[10px] uppercase">University</span>
+                      <span className="text-slate-800">{project.university}</span>
+                    </div>
+                  )}
+                  {project.preferred_tech && (
+                    <div>
+                      <span className="block font-bold text-slate-400 text-[10px] uppercase">Preferred Tech</span>
+                      <span className="text-slate-800">{project.preferred_tech}</span>
+                    </div>
+                  )}
+                  {project.deliverables && (
+                    <div className="sm:col-span-2">
+                      <span className="block font-bold text-slate-400 text-[10px] uppercase">Required Deliverables</span>
+                      <span className="text-slate-800">{project.deliverables}</span>
+                    </div>
+                  )}
+                  {(project.pages || project.budget) && (
+                    <div>
+                      <span className="block font-bold text-slate-400 text-[10px] uppercase">Pages & Budget</span>
+                      <span className="text-slate-800">{project.pages || "N/A"} | {project.budget || "N/A"}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div>
+                <h3 className="text-base font-bold text-slate-900">Requirements Detail</h3>
+                <p className="mt-3 text-sm text-slate-600 leading-relaxed whitespace-pre-wrap">
+                  {project.description}
+                </p>
+              </div>
             </div>
           </div>
 

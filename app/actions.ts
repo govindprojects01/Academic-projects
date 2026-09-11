@@ -24,6 +24,17 @@ export interface Project {
   status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "DELIVERED";
   created_at: string;
   updated_at: string;
+  course?: string;
+  branch?: string;
+  university?: string;
+  project_type?: string;
+  deadline?: string;
+  preferred_tech?: string;
+  deliverables?: string;
+  pages?: string;
+  budget?: string;
+  notes?: string;
+  phone?: string;
 }
 
 export interface ProjectFile {
@@ -38,6 +49,8 @@ export interface ProjectFile {
 
 export interface ServiceEnquiry {
   id: string;
+  user_id?: string;
+  user_email?: string;
   full_name: string;
   phone: string;
   course: string;
@@ -131,13 +144,27 @@ export async function createProject(formData: FormData) {
 // ACTION: Fetch current user's projects
 export async function getProjects(): Promise<Project[]> {
   const { userId } = await auth();
-  if (!userId) {
+  const user = await currentUser();
+  const userEmail = user?.emailAddresses[0]?.emailAddress || "";
+
+  if (!userId && !userEmail) {
     return [];
   }
 
-  const result = await sql`
-    SELECT * FROM projects WHERE user_id = ${userId} ORDER BY created_at DESC
-  `;
+  let result;
+  if (userId && userEmail) {
+    result = await sql`
+      SELECT * FROM projects WHERE user_id = ${userId} OR (user_email IS NOT NULL AND user_email != '' AND LOWER(user_email) = ${userEmail.toLowerCase()}) ORDER BY created_at DESC
+    `;
+  } else if (userId) {
+    result = await sql`
+      SELECT * FROM projects WHERE user_id = ${userId} ORDER BY created_at DESC
+    `;
+  } else {
+    result = await sql`
+      SELECT * FROM projects WHERE user_email IS NOT NULL AND user_email != '' AND LOWER(user_email) = ${userEmail.toLowerCase()} ORDER BY created_at DESC
+    `;
+  }
 
   return result as Project[];
 }
@@ -148,7 +175,10 @@ export async function getProjectDetails(projectId: string): Promise<{
   files: ProjectFile[];
 }> {
   const { userId } = await auth();
-  if (!userId) {
+  const user = await currentUser();
+  const userEmail = user?.emailAddresses[0]?.emailAddress || "";
+
+  if (!userId && !userEmail) {
     throw new Error("Unauthorized");
   }
 
@@ -165,7 +195,11 @@ export async function getProjectDetails(projectId: string): Promise<{
   const project = projectResult[0] as Project;
 
   // Authorization check: Only allow project owner or admin
-  if (project.user_id !== userId && !adminUser) {
+  const isOwner =
+    (userId && project.user_id === userId) ||
+    (userEmail && project.user_email && project.user_email.toLowerCase() === userEmail.toLowerCase());
+
+  if (!isOwner && !adminUser) {
     throw new Error("Forbidden");
   }
 
@@ -262,6 +296,10 @@ export async function uploadDeliveryFiles(projectId: string, formData: FormData)
 
 // ACTION: Submit Service Enquiry (Customer Requirement Form)
 export async function submitServiceEnquiry(formData: FormData) {
+  const { userId } = await auth();
+  const user = await currentUser();
+  const userEmail = user?.emailAddresses[0]?.emailAddress || "";
+  
   const fullName = (formData.get("name") || formData.get("fullName") || "").toString().trim();
   const phone = (formData.get("phone") || "").toString().trim();
   const course = (formData.get("course") || "").toString().trim();
@@ -273,6 +311,9 @@ export async function submitServiceEnquiry(formData: FormData) {
   const pages = (formData.get("pages") || "").toString().trim();
   const budget = (formData.get("budget") || "").toString().trim();
   const notes = (formData.get("notes") || "").toString().trim();
+
+  const userName = `${user?.firstName || ""} ${user?.lastName || ""}`.trim() || fullName || userEmail.split("@")[0];
+  const effectiveUserId = userId || `guest_${phone.replace(/\D/g, "")}`;
 
   const preferredTechArray = formData.getAll("preferredTech").map((t) => t.toString());
   const preferredTech = preferredTechArray.join(", ");
@@ -302,16 +343,16 @@ export async function submitServiceEnquiry(formData: FormData) {
       fileUrl = await uploadToCloudinary(file, "enquiries");
     } catch (err: any) {
       console.error("Cloudinary upload failed for enquiry attachment:", err);
-      // Fallback: continue saving enquiry without failing if database storage is needed
     }
   }
 
+  // 1. Insert into service_enquiries table
   const result = await sql`
     INSERT INTO service_enquiries (
-      full_name, phone, course, branch, university, project_type, deadline, topic,
+      user_id, user_email, full_name, phone, course, branch, university, project_type, deadline, topic,
       preferred_tech, deliverables, pages, budget, notes, file_url, file_name, file_size
     ) VALUES (
-      ${fullName}, ${phone}, ${course}, ${branch}, ${university}, ${projectType}, ${deadline}, ${topic},
+      ${effectiveUserId}, ${userEmail}, ${fullName}, ${phone}, ${course}, ${branch}, ${university}, ${projectType}, ${deadline}, ${topic},
       ${preferredTech}, ${deliverables}, ${pages}, ${budget}, ${notes}, ${fileUrl}, ${fileName}, ${fileSizeStr}
     )
     RETURNING id
@@ -319,8 +360,34 @@ export async function submitServiceEnquiry(formData: FormData) {
 
   const enquiryId = result[0]?.id;
 
+  // 2. Insert matching Project in projects table for Client Dashboard & Admin Projects
+  const descriptionText = notes
+    ? `${notes}\n\n[Details: ${course} | ${branch} | Tech: ${preferredTech || "Standard"} | Deliverables: ${deliverables || "Standard"}]`
+    : `Requirements: ${course} (${branch}) - ${projectType}. Tech: ${preferredTech || "Standard"}. Deliverables: ${deliverables || "Standard"}`;
+
+  const projectResult = await sql`
+    INSERT INTO projects (
+      user_id, user_email, user_name, title, description,
+      course, branch, university, project_type, deadline, preferred_tech, deliverables, pages, budget, notes
+    ) VALUES (
+      ${effectiveUserId}, ${userEmail}, ${userName}, ${topic}, ${descriptionText},
+      ${course}, ${branch}, ${university}, ${projectType}, ${deadline}, ${preferredTech}, ${deliverables}, ${pages}, ${budget}, ${notes}
+    )
+    RETURNING id
+  `;
+
+  const projectId = projectResult[0]?.id;
+
+  if (projectId && fileUrl && fileName) {
+    await sql`
+      INSERT INTO project_files (project_id, file_name, file_url, file_type, uploaded_by)
+      VALUES (${projectId}, ${fileName}, ${fileUrl}, 'requirement', ${effectiveUserId})
+    `;
+  }
+
   revalidatePath("/services");
   revalidatePath("/");
+  revalidatePath("/dashboard");
   revalidatePath("/admin");
 
   // Format WhatsApp message
@@ -346,6 +413,7 @@ Notes: ${notes || "None"}${fileUrl ? `\nAttachment URL: ${fileUrl}` : ""}`;
   return {
     success: true,
     enquiryId,
+    projectId,
     whatsappUrl: `https://wa.me/919559628719?text=${encodeURIComponent(whatsappMsg)}`,
   };
 }

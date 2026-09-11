@@ -95,9 +95,31 @@ export default async function UserDashboard() {
                     <h3 className="mt-4 text-lg font-bold text-slate-900 group-hover:text-brand-blue transition line-clamp-1">
                       {project.title}
                     </h3>
-                    <p className="mt-2 text-sm text-slate-500 line-clamp-3">
+                    
+                    {(project.course || project.project_type) && (
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {project.course && (
+                          <span className="rounded bg-blue-50 px-2 py-0.5 text-[11px] font-bold text-brand-blue border border-blue-100">
+                            {project.course}
+                          </span>
+                        )}
+                        {project.project_type && (
+                          <span className="rounded bg-slate-100 px-2 py-0.5 text-[11px] font-bold text-slate-600">
+                            {project.project_type}
+                          </span>
+                        )}
+                      </div>
+                    )}
+
+                    <p className="mt-2 text-sm text-slate-500 line-clamp-2">
                       {project.description}
                     </p>
+
+                    {project.deadline && (
+                      <p className="mt-2 text-xs font-semibold text-amber-700 bg-amber-50 rounded px-2 py-1 inline-block">
+                        📅 Deadline: {project.deadline}
+                      </p>
+                    )}
                   </div>
 
                   <div className="mt-6 flex items-center justify-between pt-4 border-t border-slate-50">

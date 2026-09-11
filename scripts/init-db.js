@@ -57,7 +57,48 @@ async function init() {
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
     `;
-    console.log("- 'project_files' table verified/created.");
+    // Create service_enquiries table using tagged templates
+    await sql`
+      CREATE TABLE IF NOT EXISTS service_enquiries (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id VARCHAR(255),
+        user_email VARCHAR(255),
+        full_name VARCHAR(255) NOT NULL,
+        phone VARCHAR(50) NOT NULL,
+        course VARCHAR(255) NOT NULL,
+        branch VARCHAR(255) NOT NULL,
+        university VARCHAR(255),
+        project_type VARCHAR(255) NOT NULL,
+        deadline VARCHAR(100) NOT NULL,
+        topic VARCHAR(255) NOT NULL,
+        preferred_tech TEXT,
+        deliverables TEXT,
+        pages VARCHAR(100),
+        budget VARCHAR(100),
+        notes TEXT,
+        file_url TEXT,
+        file_name VARCHAR(255),
+        file_size VARCHAR(50),
+        status VARCHAR(50) DEFAULT 'PENDING',
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+    `;
+    console.log("- 'service_enquiries' table verified/created.");
+
+    // Ensure projects table has extra fields
+    await sql`ALTER TABLE projects ADD COLUMN IF NOT EXISTS course VARCHAR(255);`;
+    await sql`ALTER TABLE projects ADD COLUMN IF NOT EXISTS branch VARCHAR(255);`;
+    await sql`ALTER TABLE projects ADD COLUMN IF NOT EXISTS university VARCHAR(255);`;
+    await sql`ALTER TABLE projects ADD COLUMN IF NOT EXISTS project_type VARCHAR(255);`;
+    await sql`ALTER TABLE projects ADD COLUMN IF NOT EXISTS deadline VARCHAR(100);`;
+    await sql`ALTER TABLE projects ADD COLUMN IF NOT EXISTS preferred_tech TEXT;`;
+    await sql`ALTER TABLE projects ADD COLUMN IF NOT EXISTS deliverables TEXT;`;
+    await sql`ALTER TABLE projects ADD COLUMN IF NOT EXISTS pages VARCHAR(100);`;
+    await sql`ALTER TABLE projects ADD COLUMN IF NOT EXISTS budget VARCHAR(100);`;
+    await sql`ALTER TABLE projects ADD COLUMN IF NOT EXISTS notes TEXT;`;
+    await sql`ALTER TABLE service_enquiries ADD COLUMN IF NOT EXISTS user_id VARCHAR(255);`;
+    await sql`ALTER TABLE service_enquiries ADD COLUMN IF NOT EXISTS user_email VARCHAR(255);`;
+    console.log("- 'projects' and 'service_enquiries' schemas updated.");
 
     console.log("Database initialized successfully!");
   } catch (error) {
