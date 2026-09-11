@@ -9,9 +9,9 @@ import { isAdmin } from "@/lib/admin";
 
 // Configure Cloudinary
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || "vam0lpcc",
+  api_key: process.env.CLOUDINARY_API_KEY || "192338126657561",
+  api_secret: process.env.CLOUDINARY_API_SECRET || "KQut2Ut2S50PNI8FnlvryHhqa9c",
 });
 
 export interface Project {
