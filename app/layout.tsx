@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     "Academic project help, thesis writing, printing, binding and online form services near BHU Gate, Varanasi.",
   robots: "index, follow",
   verification: {
-    google: "wZSeGy2bVKXqrvDtPFZktxl03KWCBdQwtiFwEuCvUPE",
+    google: "wZSeGy2bVKXqrvDtPFZktxl03KWCBdQwtiFwEuCvEuP",
   },
 };
 
@@ -21,10 +21,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider afterSignOutUrl="/">
-      <html lang="en">
-        <body>{children}</body>
-      </html>
-    </ClerkProvider>
+    <html lang="en">
+      <body>
+        <ClerkProvider afterSignOutUrl="/">{children}</ClerkProvider>
+      </body>
+    </html>
   );
 }
