@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     "Academic project help, thesis writing, printing, binding and online form services near BHU Gate, Varanasi.",
   robots: "index, follow",
   verification: {
-    google: "wZSeGy2bVKXqrvDtPFZktxl03KWCBdQwtiFwEuCvEuP",
+    google: "wZSeGy2bVKXqrvDtPFZktxl03KWCBdQwtiFwEuCvUPE",
   },
 };
 
