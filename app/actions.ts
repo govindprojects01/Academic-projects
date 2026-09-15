@@ -143,30 +143,35 @@ export async function createProject(formData: FormData) {
 
 // ACTION: Fetch current user's projects
 export async function getProjects(): Promise<Project[]> {
-  const { userId } = await auth();
-  const user = await currentUser();
-  const userEmail = user?.emailAddresses[0]?.emailAddress || "";
+  try {
+    const { userId } = await auth();
+    const user = await currentUser();
+    const userEmail = user?.emailAddresses[0]?.emailAddress || "";
 
-  if (!userId && !userEmail) {
+    if (!userId && !userEmail) {
+      return [];
+    }
+
+    let result;
+    if (userId && userEmail) {
+      result = await sql`
+        SELECT * FROM projects WHERE user_id = ${userId} OR (user_email IS NOT NULL AND user_email != '' AND LOWER(user_email) = ${userEmail.toLowerCase()}) ORDER BY created_at DESC
+      `;
+    } else if (userId) {
+      result = await sql`
+        SELECT * FROM projects WHERE user_id = ${userId} ORDER BY created_at DESC
+      `;
+    } else {
+      result = await sql`
+        SELECT * FROM projects WHERE user_email IS NOT NULL AND user_email != '' AND LOWER(user_email) = ${userEmail.toLowerCase()} ORDER BY created_at DESC
+      `;
+    }
+
+    return (result as Project[]) || [];
+  } catch (error) {
+    console.error("getProjects error:", error);
     return [];
   }
-
-  let result;
-  if (userId && userEmail) {
-    result = await sql`
-      SELECT * FROM projects WHERE user_id = ${userId} OR (user_email IS NOT NULL AND user_email != '' AND LOWER(user_email) = ${userEmail.toLowerCase()}) ORDER BY created_at DESC
-    `;
-  } else if (userId) {
-    result = await sql`
-      SELECT * FROM projects WHERE user_id = ${userId} ORDER BY created_at DESC
-    `;
-  } else {
-    result = await sql`
-      SELECT * FROM projects WHERE user_email IS NOT NULL AND user_email != '' AND LOWER(user_email) = ${userEmail.toLowerCase()} ORDER BY created_at DESC
-    `;
-  }
-
-  return result as Project[];
 }
 
 // ACTION: Get project details (accessible by owner or admin)
@@ -174,65 +179,79 @@ export async function getProjectDetails(projectId: string): Promise<{
   project: Project | null;
   files: ProjectFile[];
 }> {
-  const { userId } = await auth();
-  const user = await currentUser();
-  const userEmail = user?.emailAddresses[0]?.emailAddress || "";
+  try {
+    let userId: string | null = null;
+    let userEmail: string = "";
 
-  if (!userId && !userEmail) {
-    throw new Error("Unauthorized");
-  }
+    try {
+      const authObj = await auth();
+      userId = authObj?.userId || null;
+      const user = await currentUser();
+      userEmail = user?.emailAddresses[0]?.emailAddress || "";
+    } catch (authError) {
+      console.warn("Auth check failed in getProjectDetails:", authError);
+    }
 
-  const adminUser = await isAdmin();
+    const adminUser = await isAdmin();
 
-  // Fetch project using tagged templates
-  const projectResult = await sql`
-    SELECT * FROM projects WHERE id = ${projectId}
-  `;
-  if (projectResult.length === 0) {
+    // Fetch project using tagged templates
+    const projectResult = await sql`
+      SELECT * FROM projects WHERE id = ${projectId}
+    `;
+    if (projectResult.length === 0) {
+      return { project: null, files: [] };
+    }
+
+    const project = projectResult[0] as Project;
+
+    // Authorization check: Only allow project owner or admin
+    const isOwner =
+      (userId && project.user_id === userId) ||
+      (userEmail && project.user_email && project.user_email.toLowerCase() === userEmail.toLowerCase());
+
+    if (!isOwner && !adminUser) {
+      return { project: null, files: [] };
+    }
+
+    // Fetch files
+    const filesResult = await sql`
+      SELECT * FROM project_files WHERE project_id = ${projectId} ORDER BY created_at ASC
+    `;
+
+    return {
+      project,
+      files: (filesResult as ProjectFile[]) || [],
+    };
+  } catch (error) {
+    console.error("getProjectDetails error:", error);
     return { project: null, files: [] };
   }
-
-  const project = projectResult[0] as Project;
-
-  // Authorization check: Only allow project owner or admin
-  const isOwner =
-    (userId && project.user_id === userId) ||
-    (userEmail && project.user_email && project.user_email.toLowerCase() === userEmail.toLowerCase());
-
-  if (!isOwner && !adminUser) {
-    throw new Error("Forbidden");
-  }
-
-  // Fetch files
-  const filesResult = await sql`
-    SELECT * FROM project_files WHERE project_id = ${projectId} ORDER BY created_at ASC
-  `;
-
-  return {
-    project,
-    files: filesResult as ProjectFile[],
-  };
 }
 
 // ACTION: Fetch all projects for Admin
 export async function getAdminProjects(statusFilter?: string): Promise<Project[]> {
-  const adminUser = await isAdmin();
-  if (!adminUser) {
-    throw new Error("Forbidden");
-  }
+  try {
+    const adminUser = await isAdmin();
+    if (!adminUser) {
+      return [];
+    }
 
-  let result;
-  if (statusFilter && statusFilter !== "ALL") {
-    result = await sql`
-      SELECT * FROM projects WHERE status = ${statusFilter} ORDER BY created_at DESC
-    `;
-  } else {
-    result = await sql`
-      SELECT * FROM projects ORDER BY created_at DESC
-    `;
-  }
+    let result;
+    if (statusFilter && statusFilter !== "ALL") {
+      result = await sql`
+        SELECT * FROM projects WHERE status = ${statusFilter} ORDER BY created_at DESC
+      `;
+    } else {
+      result = await sql`
+        SELECT * FROM projects ORDER BY created_at DESC
+      `;
+    }
 
-  return result as Project[];
+    return (result as Project[]) || [];
+  } catch (error) {
+    console.error("getAdminProjects error:", error);
+    return [];
+  }
 }
 
 // ACTION: Update project status (Admin only)
@@ -296,9 +315,18 @@ export async function uploadDeliveryFiles(projectId: string, formData: FormData)
 
 // ACTION: Submit Service Enquiry (Customer Requirement Form)
 export async function submitServiceEnquiry(formData: FormData) {
-  const { userId } = await auth();
-  const user = await currentUser();
-  const userEmail = user?.emailAddresses[0]?.emailAddress || "";
+  let userId: string | null = null;
+  let userEmail: string = "";
+  let user: any = null;
+
+  try {
+    const authObj = await auth();
+    userId = authObj?.userId || null;
+    user = await currentUser();
+    userEmail = user?.emailAddresses[0]?.emailAddress || "";
+  } catch (e) {
+    console.warn("Auth check failed in submitServiceEnquiry:", e);
+  }
   
   const fullName = (formData.get("name") || formData.get("fullName") || "").toString().trim();
   const phone = (formData.get("phone") || "").toString().trim();
@@ -420,23 +448,28 @@ Notes: ${notes || "None"}${fileUrl ? `\nAttachment URL: ${fileUrl}` : ""}`;
 
 // ACTION: Fetch Service Enquiries for Admin
 export async function getServiceEnquiries(statusFilter?: string): Promise<ServiceEnquiry[]> {
-  const adminUser = await isAdmin();
-  if (!adminUser) {
-    throw new Error("Forbidden");
-  }
+  try {
+    const adminUser = await isAdmin();
+    if (!adminUser) {
+      return [];
+    }
 
-  let result;
-  if (statusFilter && statusFilter !== "ALL") {
-    result = await sql`
-      SELECT * FROM service_enquiries WHERE status = ${statusFilter} ORDER BY created_at DESC
-    `;
-  } else {
-    result = await sql`
-      SELECT * FROM service_enquiries ORDER BY created_at DESC
-    `;
-  }
+    let result;
+    if (statusFilter && statusFilter !== "ALL") {
+      result = await sql`
+        SELECT * FROM service_enquiries WHERE status = ${statusFilter} ORDER BY created_at DESC
+      `;
+    } else {
+      result = await sql`
+        SELECT * FROM service_enquiries ORDER BY created_at DESC
+      `;
+    }
 
-  return result as ServiceEnquiry[];
+    return (result as ServiceEnquiry[]) || [];
+  } catch (error) {
+    console.error("getServiceEnquiries error:", error);
+    return [];
+  }
 }
 
 // ACTION: Update Enquiry Status (Admin only)
