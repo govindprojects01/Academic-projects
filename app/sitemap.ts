@@ -1,16 +1,28 @@
 import type { MetadataRoute } from "next";
 
-const baseUrl = "https://govindprojects01.github.io/Academic-projects";
+const baseUrl = "https://www.projectarea.online";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
-    "",
-    "/about",
-    "/services",
-    "/online-form",
-    "/contact",
-  ].map((path) => ({
-    url: `${baseUrl}${path}`,
-    lastModified: new Date("2026-08-29"),
-  }));
+    {
+      url: `${baseUrl}/`,
+      lastModified: new Date("2026-09-29"),
+    },
+    {
+      url: `${baseUrl}/about`,
+      lastModified: new Date("2026-09-29"),
+    },
+    {
+      url: `${baseUrl}/services`,
+      lastModified: new Date("2026-09-29"),
+    },
+    {
+      url: `${baseUrl}/online-form`,
+      lastModified: new Date("2026-09-29"),
+    },
+    {
+      url: `${baseUrl}/contact`,
+      lastModified: new Date("2026-09-29"),
+    },
+  ];
 }
