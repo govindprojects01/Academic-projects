@@ -9,7 +9,6 @@ export const navItems = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
   { href: "/services", label: "Services" },
-  { href: "/online-form", label: "Online Form" },
   { href: "/contact", label: "Contact" },
 ] as const;
 
@@ -79,45 +78,6 @@ export const academicServices: Service[] = [
     title: "Viva & Project Guidance",
     description: "Complete guidance from topic selection to final viva.",
     metric: "Full support",
-  },
-];
-
-export const onlineForms = [
-  {
-    title: "A to Z Suvidha",
-    description: "Cyber work and online service partner portal.",
-    href: "https://partners.a2zsuvidhaa.com/login",
-  },
-  {
-    title: "UIDAI",
-    tag: "Aadhaar Services",
-    description: "Aadhaar update, download and verification services.",
-    href: "https://uidai.gov.in/",
-  },
-  {
-    title: "Aadhaar Download",
-    description: "Official UIDAI Aadhaar download guide.",
-    href: "https://uidai.gov.in/en/media-resources/resources/videos/12108-download-aadhaar.html",
-  },
-  {
-    title: "Parivahan",
-    description: "Official government transport services website.",
-    href: "https://parivahan.gov.in/",
-  },
-  {
-    title: "Election Commission of India",
-    description: "Voter ID, election information and results.",
-    href: "https://www.eci.gov.in/",
-  },
-  {
-    title: "EPFO India",
-    description: "PF balance, UAN, pension and provident fund services.",
-    href: "https://www.epfindia.gov.in/site_en/index.php",
-  },
-  {
-    title: "DigiLocker",
-    description: "Digital documents including Aadhaar, DL and marksheets.",
-    href: "https://www.digilocker.gov.in/",
   },
 ];
 
