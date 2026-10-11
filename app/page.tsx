@@ -88,6 +88,43 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="bg-brand-mist px-4 py-14 sm:px-6">
+        <div className="mx-auto max-w-7xl">
+          <SectionHeading
+            eyebrow="Academic services"
+            title="Project, Thesis and Synopsis Support"
+            subtitle="Explore dedicated information for your academic requirements, from research planning to final document formatting."
+          />
+          <div className="mt-8 grid gap-5 md:grid-cols-3">
+            {[
+              {
+                href: "/academic-projects",
+                title: "Academic Project Guidance",
+                description: "Planning, research methodology, data analysis and report structure for MBA, BCA, MCA, B.Tech and other courses.",
+              },
+              {
+                href: "/thesis-dissertation",
+                title: "Thesis and Dissertation",
+                description: "Formatting, reference organisation, tables, figures and print-ready document preparation.",
+              },
+              {
+                href: "/thesis-synopsis",
+                title: "Synopsis and Research Proposal",
+                description: "Research objectives, literature review planning, methodology and reference formatting.",
+              },
+            ].map((item) => (
+              <article key={item.href} className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 className="text-xl font-black text-brand-navy">{item.title}</h3>
+                <p className="mt-3 leading-7 text-slate-600">{item.description}</p>
+                <a href={item.href} className="mt-5 inline-flex font-bold text-brand-blue underline underline-offset-4">
+                  Explore service
+                </a>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="bg-white px-4 py-14 sm:px-6">
         <div className="mx-auto grid max-w-7xl gap-6 md:grid-cols-3">
           {features.map((feature) => (
