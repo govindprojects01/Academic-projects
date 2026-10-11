@@ -5,10 +5,19 @@ import { SectionHeading } from "@/components/SectionHeading";
 import { email, office, phonePrimary, phoneSecondary } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Contact Us",
+  title: "Contact Project Area | Thesis Printing Near BHU Gate, Varanasi",
   description:
-    "Contact Project Area for MBA, B.Tech, MCA projects, thesis writing, printing and binding near BHU Gate, Varanasi.",
-  keywords: ["MBA projects Varanasi", "Thesis printing BHU", "Academic Projects", "Academic help BHU"],
+    "Contact Project Area for academic project guidance, thesis formatting, printing and binding near BHU Gate, Lanka, Varanasi. Call or send an enquiry online.",
+  alternates: {
+    canonical: "https://www.projectarea.online/contact",
+  },
+  openGraph: {
+    title: "Contact Project Area | Varanasi",
+    description:
+      "Get in touch for project guidance, thesis and dissertation formatting, printing and binding near BHU Gate, Varanasi.",
+    url: "https://www.projectarea.online/contact",
+    type: "website",
+  },
 };
 
 type ContactCard = {
@@ -47,8 +56,8 @@ export default function ContactPage() {
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
         <SectionHeading
           eyebrow="Contact"
-          title="Contact Us"
-          subtitle="Academic projects, thesis, printing and binding support near BHU Gate, Varanasi."
+          title="Contact Project Area in Varanasi"
+          subtitle="Ask about academic project guidance, thesis formatting, printing and binding support near BHU Gate, Lanka."
         />
 
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -74,7 +83,7 @@ export default function ContactPage() {
 
         <div className="mt-12 overflow-hidden rounded-lg shadow-soft">
           <iframe
-            title="Project Area office location"
+            title="Map showing Lanka near BHU Gate, Varanasi"
             src="https://www.google.com/maps?q=Lanka%20BHU%20Gate%20Varanasi&output=embed"
             loading="lazy"
             className="h-80 w-full border-0"
@@ -83,12 +92,12 @@ export default function ContactPage() {
       </section>
 
       <section className="bg-white px-4 py-16 sm:px-6">
-        <SectionHeading title="Send Enquiry" subtitle="Share your requirement and we will reply on WhatsApp." />
+        <SectionHeading title="Send an Enquiry" subtitle="Share your requirement and our team will reply." />
         <div className="mt-10">
           <EnquiryForm
             showEmail
             showFile
-            services={["MBA Project", "B.Tech / MCA Project", "Thesis Writing", "Printing & Binding"]}
+            services={["MBA Project", "B.Tech / MCA Project", "Thesis Formatting", "Printing & Binding"]}
           />
         </div>
       </section>
