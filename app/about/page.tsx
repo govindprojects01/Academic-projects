@@ -6,16 +6,20 @@ import { SectionHeading } from "@/components/SectionHeading";
 import { email, office } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "About Founder",
-  description: "About Govind Sharma, founder of Project Area academic assistance services.",
+  title: "About Project Area | Academic Support Near BHU Gate",
+  description:
+    "Learn about Project Area and its academic project guidance, thesis formatting, printing and binding support for students near BHU Gate, Lanka, Varanasi.",
+  alternates: {
+    canonical: "https://www.projectarea.online/about",
+  },
 };
 
 const strengths = [
-  "Project and thesis writing for all streams",
-  "Synopsis, proposal and research papers",
+  "Project topic and research guidance",
+  "Synopsis, proposal and report formatting",
   "Thesis printing, binding and formatting",
-  "Plagiarism-free content support",
-  "Viva and final submission guidance",
+  "Original writing support and citation guidance",
+  "Presentation and viva preparation support",
 ];
 
 export default function AboutPage() {
@@ -25,38 +29,37 @@ export default function AboutPage() {
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
           <div className="rounded-lg bg-brand-mist p-8 shadow-soft">
             <div className="relative mx-auto h-56 w-56 overflow-hidden rounded-full border-4 border-white shadow-soft">
-              <Image src="/govind.jpg" alt="Govind Sharma - Founder" fill className="object-cover" priority />
+              <Image src="/govind.jpg" alt="Govind Sharma, founder of Project Area" fill className="object-cover" priority />
             </div>
             <div className="mt-8 text-center">
-              <h1 className="text-3xl font-black text-brand-navy">Govind Sharma</h1>
-              <p className="mt-2 font-bold text-brand-blue">Founder - Academic Projects</p>
+              <h1 className="text-3xl font-black text-brand-navy">About Project Area</h1>
+              <p className="mt-2 font-bold text-brand-blue">Academic Project and Thesis Support</p>
             </div>
           </div>
 
           <div>
             <SectionHeading
               align="left"
-              eyebrow="About"
-              title="Student-focused academic help near BHU Gate"
-              subtitle="Project Area supports students with high-quality academic projects, research work, documentation and professional guidance."
+              eyebrow="Who We Are"
+              title="Student-focused academic assistance near BHU Gate"
+              subtitle="Project Area helps students understand and organise their academic projects, research documentation, presentations and printing requirements."
             />
             <div className="mt-8 space-y-5 text-base leading-8 text-slate-700">
               <p>
-                We specialize in helping students from MBA, B.Tech, MCA, BCA, M.Sc,
-                Diploma and other courses complete academic requirements with confidence.
+                We support students from MBA, B.Tech, MCA, BCA, M.Sc, diploma and other courses
+                with project planning, research documentation, formatting and presentation preparation.
               </p>
               <p>
-                Our office is located at <strong>{office}</strong>, making us accessible for
-                students of Banaras Hindu University and nearby colleges.
+                Our office is located at <strong>{office}</strong>, convenient for students of Banaras
+                Hindu University and nearby colleges.
               </p>
               <p>
-                Our academic team brings <strong>15+ years of experience</strong> in academic
-                writing, project development, research methodology, plagiarism control and final
-                submission support.
+                We also work with <strong>BABA Thesis & Printing</strong> for thesis printing,
+                binding and document finishing services near BHU Gate, Varanasi.
               </p>
               <p>
-                We are proudly partnered with <strong>BABA Thesis & Printing</strong>, a reputed
-                20+ years old thesis printing and binding shop near BHU Gate, Varanasi.
+                Our goal is to provide clear communication, practical guidance and support that helps
+                students understand their work and prepare their final submissions responsibly.
               </p>
             </div>
           </div>
@@ -66,7 +69,7 @@ export default function AboutPage() {
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
         <div className="grid gap-8 lg:grid-cols-[1fr_0.8fr]">
           <div className="rounded-lg bg-white p-8 shadow-sm">
-            <h2 className="text-2xl font-black text-brand-navy">What We Provide</h2>
+            <h2 className="text-2xl font-black text-brand-navy">How We Help</h2>
             <ul className="mt-6 grid gap-3 sm:grid-cols-2">
               {strengths.map((item) => (
                 <li key={item} className="rounded-md bg-slate-50 p-4 font-bold text-brand-blue">
@@ -77,10 +80,9 @@ export default function AboutPage() {
           </div>
 
           <div className="rounded-lg bg-brand-navy p-8 text-white shadow-soft">
-            <h2 className="text-2xl font-black">Contact Us</h2>
+            <h2 className="text-2xl font-black">Contact Project Area</h2>
             <p className="mt-4 leading-7 text-blue-50">
-              For project enquiries, thesis support, printing, binding or any academic assistance,
-              feel free to contact us.
+              Contact us for project guidance, thesis formatting, printing, binding or documentation support.
             </p>
             <p className="mt-5 font-bold">
               Email: <a href={`mailto:${email}`} className="underline">{email}</a>
