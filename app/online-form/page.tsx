@@ -6,22 +6,30 @@ import { SectionHeading } from "@/components/SectionHeading";
 import { onlineForms } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Online Forms",
-  description: "Useful online form links and WhatsApp enquiry form support.",
+  title: "Online Form & Application Assistance in Varanasi",
+  description:
+    "Find useful official online form links and get assistance with online applications in Lanka, near BHU Gate, Varanasi. Always review details on official portals before submitting.",
+  alternates: {
+    canonical: "https://www.projectarea.online/online-form",
+  },
 };
 
 export default function OnlineFormPage() {
   return (
     <PageShell>
       <section className="bg-brand-blue px-4 py-16 text-center text-white sm:px-6">
-        <h1 className="text-4xl font-black sm:text-5xl">Online Forms & Applications</h1>
+        <h1 className="text-4xl font-black sm:text-5xl">Online Forms & Application Assistance</h1>
         <p className="mt-4 text-lg font-semibold text-blue-50">
-          Easy apply support, one form and direct assistance.
+          Useful official links and local application support in Varanasi.
         </p>
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <SectionHeading title="Available Online Forms" />
+        <SectionHeading title="Useful Official Online Forms" />
+        <p className="mt-4 text-center text-sm leading-6 text-slate-600">
+          Government services are managed by their respective official portals. Verify eligibility,
+          fees and required documents on the official website before applying.
+        </p>
         <div className="mt-10 grid gap-4">
           {onlineForms.map((form) => (
             <article
@@ -38,7 +46,7 @@ export default function OnlineFormPage() {
                 <p className="mt-2 text-sm leading-6 text-slate-600">{form.description}</p>
               </div>
               <ButtonLink href={form.href} external variant="whatsapp">
-                Open Form
+                Open Official Website
               </ButtonLink>
             </article>
           ))}
@@ -47,8 +55,8 @@ export default function OnlineFormPage() {
 
       <section className="bg-white px-4 py-16 sm:px-6">
         <SectionHeading
-          title="Online Application Form"
-          subtitle="Fill details once and our team will contact you directly."
+          title="Request Online Application Assistance"
+          subtitle="Share your requirement and our team will contact you. Do not send passwords, OTPs or other sensitive login details."
         />
         <div className="mt-10">
           <EnquiryForm
